@@ -4,12 +4,13 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 // --- NEW: Import Firebase functions and our Auth Context ---
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 
 export default function Auth() {
     const [isLogin, setIsLogin] = useState(true);
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -24,15 +25,14 @@ export default function Auth() {
     const handleSignup = async (e) => {
         e.preventDefault();
         setError('');
-        if (password !== confirmPassword) {
-            return setError("Passwords do not match!");
-        }
+        if (password !== confirmPassword) return setError('Passwords do not match');
         try {
             setLoading(true);
-            await createUserWithEmailAndPassword(auth, email, password);
+            const cred = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(cred.user, { displayName: username });
             navigate('/');
         } catch (err) {
-            setError(err.message.replace('Firebase: ', ''));
+            setError(err.message);
         }
         setLoading(false);
     };
@@ -50,7 +50,7 @@ export default function Auth() {
         }
         setLoading(false);
     };
-    
+
     // --- NEW: Logout Handler ---
     const handleLogout = () => {
         signOut(auth);
@@ -63,9 +63,9 @@ export default function Auth() {
                 <Header />
                 <main className="min-h-[75vh] flex items-center justify-center px-6 text-white">
                     <div className="text-center" data-aos="zoom-in">
-                        <h1 className="text-2xl mb-4">You are logged in with {currentUser.email}</h1>
-                        <button 
-                            onClick={handleLogout} 
+                        <h1 className="text-2xl mb-4">You are logged in as {currentUser.displayName}</h1>
+                        <button
+                            onClick={handleLogout}
                             className="bg-white text-black px-6 py-2 rounded-full hover:bg-gray-200 transition"
                         >
                             Logout
@@ -76,7 +76,7 @@ export default function Auth() {
             </>
         );
     }
-    
+
     // Your existing JSX with modifications
     return (
         <>
@@ -101,7 +101,7 @@ export default function Auth() {
                             Signup
                         </button>
                     </div>
-                    
+
                     {/* --- NEW: Display error messages here --- */}
                     {error && <p className="text-red-500 text-center text-sm mb-4">{error}</p>}
 
@@ -124,6 +124,8 @@ export default function Auth() {
                             <div className="w-full shrink-0 px-1">
                                 <form className="space-y-4" onSubmit={handleSignup}>
                                     <h2 className="text-2xl font-bold mb-2">Create account</h2>
+                                    <input type="text" placeholder='Username' required value={username} onChange={(e) => setUsername(e.target.value)} className='w-full px-4
+                                    py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black'/>
                                     <input type="email" placeholder="Email Address" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black" />
                                     <input type="password" placeholder="Password" required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black" />
                                     <input type="password" placeholder="Confirm Password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black" />
