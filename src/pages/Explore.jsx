@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import SummarizeButton from '../components/SummarizeButton';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -59,7 +60,7 @@ export default function Explore() {
         data-aos-duration="1000"
       >
         <h1 className="text-4xl font-bold mb-4" data-aos="fade-right" data-aos-delay="200">
-          Available Notes
+          Explore Notes
         </h1>
         <p className="text-gray-400 mb-8" data-aos="fade-right" data-aos-delay="400">
           Search, filter and download notes shared by students across India.
@@ -160,6 +161,11 @@ export default function Explore() {
                     <p><strong>Year:</strong> {file.year}</p>
                   </div>
                 </div>
+
+                <div className='mt-3'>
+                    <SummarizeButton fileURL={file.fileURL} />
+                </div>
+
                 <a
                   href={file.fileURL}
                   target="_blank"
