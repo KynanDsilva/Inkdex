@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
-// --- NEW: Import Firebase functions and our Auth Context ---
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
+
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function Auth() {
     const [isLogin, setIsLogin] = useState(true);
@@ -14,14 +15,13 @@ export default function Auth() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [college, setCollege] = useState('');  // Added college state
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // --- NEW: Hooks for navigation and getting current user ---
     const { currentUser } = useAuth();
     const navigate = useNavigate();
 
-    // --- NEW: Signup Handler ---
     const handleSignup = async (e) => {
         e.preventDefault();
         setError('');
@@ -30,6 +30,14 @@ export default function Auth() {
             setLoading(true);
             const cred = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(cred.user, { displayName: username });
+            
+            // Save college to Firestore under "users" collection with user.uid as doc ID
+            await setDoc(doc(db, "users", cred.user.uid), {
+                username,
+                email,
+                college,
+            });
+
             navigate('/');
         } catch (err) {
             setError(err.message);
@@ -37,7 +45,6 @@ export default function Auth() {
         setLoading(false);
     };
 
-    // --- NEW: Login Handler ---
     const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
@@ -51,12 +58,10 @@ export default function Auth() {
         setLoading(false);
     };
 
-    // --- NEW: Logout Handler ---
     const handleLogout = () => {
         signOut(auth);
     };
 
-    // --- NEW: Show a different UI if the user is already logged in ---
     if (currentUser) {
         return (
             <>
@@ -77,7 +82,6 @@ export default function Auth() {
         );
     }
 
-    // Your existing JSX with modifications
     return (
         <>
             <Header />
@@ -102,7 +106,6 @@ export default function Auth() {
                         </button>
                     </div>
 
-                    {/* --- NEW: Display error messages here --- */}
                     {error && <p className="text-red-500 text-center text-sm mb-4">{error}</p>}
 
                     <div className="relative overflow-hidden">
@@ -112,24 +115,83 @@ export default function Auth() {
                             <div className="w-full shrink-0 px-1">
                                 <form className="space-y-4" onSubmit={handleLogin}>
                                     <h2 className="text-2xl font-bold mb-2">Welcome back</h2>
-                                    <input type="email" placeholder="Email Address" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black" />
-                                    <input type="password" placeholder="Password" required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black" />
-                                    <button type="submit" disabled={loading} className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition disabled:bg-gray-500">
+                                    <input
+                                        type="email"
+                                        placeholder="Email Address"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black"
+                                    />
+                                    <input
+                                        type="password"
+                                        placeholder="Password"
+                                        required
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black"
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition disabled:bg-gray-500"
+                                    >
                                         {loading ? 'Logging in...' : 'Login'}
                                     </button>
-                                    <p className="text-center text-sm text-gray-500"><a href="#" className="hover:underline">Forgot password?</a></p>
+                                    <p className="text-center text-sm text-gray-500">
+                                        <a href="#" className="hover:underline">Forgot password?</a>
+                                    </p>
                                 </form>
                             </div>
 
                             <div className="w-full shrink-0 px-1">
                                 <form className="space-y-4" onSubmit={handleSignup}>
                                     <h2 className="text-2xl font-bold mb-2">Create account</h2>
-                                    <input type="text" placeholder='Username' required value={username} onChange={(e) => setUsername(e.target.value)} className='w-full px-4
-                                    py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black'/>
-                                    <input type="email" placeholder="Email Address" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black" />
-                                    <input type="password" placeholder="Password" required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black" />
-                                    <input type="password" placeholder="Confirm Password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black" />
-                                    <button type="submit" disabled={loading} className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition disabled:bg-gray-500">
+                                    <input
+                                        type="text"
+                                        placeholder='Username'
+                                        required
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        className='w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black'
+                                    />
+                                    <input
+                                        type="email"
+                                        placeholder="Email Address"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black"
+                                    />
+                                    <input
+                                        type="password"
+                                        placeholder="Password"
+                                        required
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black"
+                                    />
+                                    <input
+                                        type="password"
+                                        placeholder="Confirm Password"
+                                        required
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="College Name"
+                                        required
+                                        value={college}
+                                        onChange={(e) => setCollege(e.target.value)}
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-black"
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition disabled:bg-gray-500"
+                                    >
                                         {loading ? 'Creating Account...' : 'Signup'}
                                     </button>
                                 </form>
