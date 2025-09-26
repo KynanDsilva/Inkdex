@@ -1,11 +1,12 @@
-import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import 'boxicons/css/boxicons.min.css';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Header = () => {
     const { currentUser } = useAuth();
+    const navigate = useNavigate();
 
     const toggleMobileMenu = () => {
         const mobileMenu = document.getElementById('mobileMenu');
@@ -19,7 +20,8 @@ const Header = () => {
 
     const handleLogout = async () => {
         await signOut(auth);
-    }
+        navigate("/"); // Redirects to homepage after logout
+    }    
 
 
     return (
