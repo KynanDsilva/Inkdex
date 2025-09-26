@@ -54,7 +54,7 @@ export default function Upload() {
     if (!file) return setMessage('Please select a file to upload.');
     if (!currentUser) return setMessage('You must be logged in to upload.');
 
-    const storageRef = ref(storage, `${Date.now()}-${file.name}`);
+    const storageRef = ref(storage, `notes/${currentUser.uid}/${Date.now()}-${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
