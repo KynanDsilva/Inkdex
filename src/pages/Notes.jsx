@@ -1,38 +1,40 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; // Import Link
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
-
-/* helper: stable session id for this browser tab */
-const getSessionId = () => {
-  let id = sessionStorage.getItem('sessionId');
-  if (!id) {
-    id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    sessionStorage.setItem('sessionId', id);
-  }
-  return id;
-};
+import { useAuth } from '../context/AuthContext'; // NEW: Import the auth context
 
 export default function Notes() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const sessionId = getSessionId();
+  const { currentUser } = useAuth(); // NEW: Get the currently logged-in user
 
   useEffect(() => {
-    const q = query(
-      collection(db, 'notes'),
-      where('sessionId', '==', sessionId),
-      orderBy('createdAt', 'desc')
-    );
+    // NEW: Only fetch notes if a user is logged in
+    if (currentUser) {
+      // The query now looks for documents where the 'userId' field
+      // matches the logged-in user's unique ID (uid).
+      const q = query(
+        collection(db, 'notes'),
+        where('userId', '==', currentUser.uid),
+        orderBy('createdAt', 'desc')
+      );
 
-    const unsub = onSnapshot(q, (snap) => {
-      setFiles(snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      const unsub = onSnapshot(q, (snap) => {
+        setFiles(snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+        setLoading(false);
+      });
+
+      // Cleanup the listener when the component unmounts
+      return () => unsub();
+    } else {
+      // If no user is logged in, set files to empty and stop loading
+      setFiles([]);
       setLoading(false);
-    });
-
-    return () => unsub();
-  }, [sessionId]);
+    }
+  }, [currentUser]); // NEW: The effect re-runs if the user logs in or out
 
   return (
     <>
@@ -46,10 +48,15 @@ export default function Notes() {
           Your Notes
         </h1>
         <p className="text-gray-400 mb-8" data-aos="fade-right" data-aos-delay="400">
-          Notes you uploaded
+          Notes you have personally uploaded.
         </p>
 
-        {loading ? (
+        {/* NEW: Handle the case where there is no logged-in user */}
+        {!currentUser ? (
+          <p>
+            Please <Link to="/auth" className="text-blue-400 hover:underline">login or sign up</Link> to see your notes.
+          </p>
+        ) : loading ? (
           <p>Loading your notes…</p>
         ) : files.length === 0 ? (
           <p>You haven’t uploaded any notes yet.</p>
