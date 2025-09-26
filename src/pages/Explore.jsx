@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import SummarizeButton from '../components/SummarizeButton';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -162,10 +161,6 @@ export default function Explore() {
                   </div>
                 </div>
 
-                <div className='mt-3'>
-                    <SummarizeButton fileURL={file.fileURL} />
-                </div>
-
                 <a
                   href={file.fileURL}
                   target="_blank"
@@ -191,4 +186,5 @@ export default function Explore() {
       <Footer />
     </>
   );
+
 }
