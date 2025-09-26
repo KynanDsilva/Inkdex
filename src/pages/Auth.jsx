@@ -10,8 +10,6 @@ import { useAuth } from '../context/AuthContext';
 
 export default function Auth() {
     const [isLogin, setIsLogin] = useState(true);
-
-    // --- NEW: State for form inputs, errors, and loading ---
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -32,7 +30,7 @@ export default function Auth() {
         try {
             setLoading(true);
             await createUserWithEmailAndPassword(auth, email, password);
-            navigate('/'); // Redirect to homepage on successful signup
+            navigate('/');
         } catch (err) {
             setError(err.message.replace('Firebase: ', ''));
         }
@@ -46,7 +44,7 @@ export default function Auth() {
         try {
             setLoading(true);
             await signInWithEmailAndPassword(auth, email, password);
-            navigate('/'); // Redirect to homepage on successful login
+            navigate('/');
         } catch (err) {
             setError(err.message.replace('Firebase: ', ''));
         }
@@ -65,7 +63,7 @@ export default function Auth() {
                 <Header />
                 <main className="min-h-[75vh] flex items-center justify-center px-6 text-white">
                     <div className="text-center" data-aos="zoom-in">
-                        <h1 className="text-2xl mb-4">You are logged in as {currentUser.email}</h1>
+                        <h1 className="text-2xl mb-4">You are logged in with {currentUser.email}</h1>
                         <button 
                             onClick={handleLogout} 
                             className="bg-white text-black px-6 py-2 rounded-full hover:bg-gray-200 transition"
