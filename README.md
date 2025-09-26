@@ -9,11 +9,11 @@
 A **cloud-based notes sharing platform** built for students.  
 Upload, explore, and access study materials seamlessly.  
 
-🌐 **Live Demo:** [inkdex-studio.vercel.app](https://inkdex-studio.vercel.app)
+Live Demo: [inkdex-studio.vercel.app](https://inkdex-studio.vercel.app)
 
 ---
 
-## 🚀 Tech Stack
+## Tech Stack
 - **Frontend:** React + Vite  
 - **Styling:** Tailwind CSS  
 - **Backend & Auth:** Firebase (Auth, Firestore, Storage)  
@@ -21,29 +21,29 @@ Upload, explore, and access study materials seamlessly.
 
 ---
 
-## ✨ Current Features
-- 🔐 **Authentication** – Sign up, log in, and manage profile with Firebase Auth.  
-- ☁️ **Upload Notes** – Upload files with metadata (title, subject, semester, year).  
-- 🏷️ **Dynamic Tags** – Create new subject/semester/year tags on the fly.  
-- 🔍 **Explore Notes** – Search by title, filter by subject/semester/year, and download.  
-- 📑 **Your Notes** – View and manage notes uploaded in the current session.  
-- 👤 **Profile Page** – See your username/email and log out securely.  
-- 🎨 **Responsive UI** – Minimal, modern design with smooth animations.  
+## Current Features
+- **Authentication** – Sign up, log in, and manage profile with Firebase Auth.  
+- **Upload Notes** – Upload files with metadata (title, subject, semester, year).  
+- **Dynamic Tags** – Create new subject/semester/year tags on the fly.  
+- **Explore Notes** – Search by title, filter by subject/semester/year, and download.  
+- **Your Notes** – View and manage notes uploaded in the current session.  
+- **Profile Page** – See your username/email and log out securely.  
+- **Responsive UI** – Minimal, modern design with smooth animations.  
 
 ---
 
-## 📌 Roadmap
-- 🌐 Google / Microsoft login  
-- 💬 Community features – ratings, upvotes, comments  
-- 🔎 OCR-powered search for handwritten notes  
-- 🤖 AI summaries for quick revision  
-- 🏆 Gamification – leaderboards, contributor badges  
-- 🎓 LMS integrations (Moodle, Canvas, Blackboard)  
-- 🌍 Cross-campus/global sharing  
+## Roadmap
+- Google / Microsoft login  
+- Community features – ratings, upvotes, comments  
+- OCR-powered search for handwritten notes  
+- AI summaries for quick revision  
+- Gamification – leaderboards, contributor badges  
+- LMS integrations (Moodle, Canvas, Blackboard)  
+- Cross-campus/global sharing  
 
 ---
 
-## ⚡ Getting Started
+## Getting Started
 ```bash
 # 1. Clone the repository
 git clone https://github.com/your-username/inkdex-studio.git
@@ -58,5 +58,3 @@ npm install
 # 4. Start the development server
 npm run dev
 ```
-
----
