@@ -1,0 +1,96 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { db } from '../firebase';
+
+export default function Explore() {
+  const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const q = query(collection(db, "notes"), orderBy("createdAt", "desc"));
+    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const filesData = [];
+      querySnapshot.forEach((doc) => {
+        filesData.push({ id: doc.id, ...doc.data() });
+      });
+      setFiles(filesData);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  return (
+    <>
+      <Header />
+      <main
+        className="max-w-5xl mx-auto px-6 py-20 text-white"
+        data-aos="fade-up"
+        data-aos-duration="1000"
+      >
+        <h1
+          className="text-4xl font-bold mb-4"
+          data-aos="fade-right"
+          data-aos-delay="200"
+        >
+          Available Notes
+        </h1>
+        <p
+          className="text-gray-400 mb-8 max-w-2xl"
+          data-aos="fade-right"
+          data-aos-delay="400"
+        >
+          Search, filter and download notes shared by students across India.
+        </p>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {loading ? (
+            <p>Loading notes...</p>
+          ) : files.length === 0 ? (
+            <p>No notes have been uploaded yet. Be the first!</p>
+          ) : (
+            files.map((file, i) => (
+              <div
+                key={file.id}
+                className="bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col justify-between hover:border-white transition"
+                data-aos="zoom-in"
+                data-aos-delay={100 * i}
+              >
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">{file.title}</h3>
+                  <div className="text-gray-400 text-sm mb-3 space-y-1">
+                    <p><strong>Subject:</strong> {file.subject}</p>
+                    <p><strong>Semester:</strong> {file.semester}</p>
+                    <p><strong>Year:</strong> {file.year}</p>
+                  </div>
+                </div>
+                <a 
+                  href={file.fileURL} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-400 hover:underline mt-4 self-start"
+                >
+                  Download →
+                </a>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="mt-10" data-aos="fade-up" data-aos-delay="600">
+          <Link
+            to="/upload"
+            className="inline-block bg-[#a7a7a7] text-black px-6 py-2 rounded-full hover:bg-white transition"
+          >
+            Upload your own →
+          </Link>
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
+}
