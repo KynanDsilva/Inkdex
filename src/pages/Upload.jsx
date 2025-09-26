@@ -1,19 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { collection, addDoc } from 'firebase/firestore';
+import { doc, collection, addDoc, getDoc } from 'firebase/firestore';
 import { storage, db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 
 const EXISTING = {
-  subject: ['Maths', 'Physics', 'Chemistry', 'CSE', 'Mechanical'],
+  subject: ['Calculus', 'Physics', 'Chemistry'],
   sem: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4', 'Sem 5', 'Sem 6', 'Sem 7', 'Sem 8'],
   year: ['2021', '2022', '2023', '2024', '2025'],
 };
 
 export default function Upload() {
   const { currentUser } = useAuth();
+  const [userCollege, setUserCollege] = useState('');
+
+  useEffect(() => {
+    if (!currentUser) return;
+    (async () => {
+      const snap = await getDoc(doc(db, 'users', currentUser.uid));
+      if (snap.exists()) setUserCollege(snap.data().college || 'Unknown');
+    })();
+  }, [currentUser])
 
   /* form fields */
   const [subject, setSubject] = useState('');
@@ -40,13 +49,12 @@ export default function Upload() {
   };
 
   /* ---------- submit handler ---------- */
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-
     if (!file) return setMessage('Please select a file to upload.');
     if (!currentUser) return setMessage('You must be logged in to upload.');
 
-    const storageRef = ref(storage, `notes/${currentUser.uid}/${Date.now()}-${file.name}`);
+    const storageRef = ref(storage, `${Date.now()}-${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
@@ -62,16 +70,20 @@ export default function Upload() {
       },
       async () => {
         const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        setMessage('Saving note details…');
+
         await addDoc(collection(db, 'notes'), {
           title,
           subject,
           semester: sem,
           year,
+          college: userCollege,   // ← auto-tagged from profile
           fileURL: downloadURL,
-          userId: currentUser.uid,
+          ownerId: currentUser.uid,
           sessionId: sessionStorage.getItem('sessionId'),
           createdAt: new Date(),
         });
+
         setMessage('Note successfully uploaded!');
         // reset form
         setTitle('');
@@ -113,6 +125,17 @@ export default function Upload() {
             required
           />
 
+          {/* College Display */}
+          <div>
+            <label className="block text-sm text-gray-400 mb-1">College</label>
+            <input
+              type="text"
+              value={userCollege}
+              disabled
+              className="w-full px-4 py-3 rounded-lg bg-gray-900 border border-gray-700 text-white cursor-not-allowed"
+            />
+          </div>
+
           {/* Subject */}
           <div>
             <label className="block text-sm mb-2 text-gray-400">Subject</label>
@@ -121,9 +144,9 @@ export default function Upload() {
               onChange={(e) =>
                 e.target.value === '__create'
                   ? (() => {
-                      const v = prompt('New subject tag:');
-                      handleCreate(v, setSubject, subjectOpts, setSubjectOpts);
-                    })()
+                    const v = prompt('New subject tag:');
+                    handleCreate(v, setSubject, subjectOpts, setSubjectOpts);
+                  })()
                   : setSubject(e.target.value)
               }
               className="w-full px-4 py-2 rounded bg-gray-900 border border-gray-700 focus:outline-none focus:border-white"
@@ -145,9 +168,9 @@ export default function Upload() {
               onChange={(e) =>
                 e.target.value === '__create'
                   ? (() => {
-                      const v = prompt('New semester tag:');
-                      handleCreate(v, setSem, semOpts, setSemOpts);
-                    })()
+                    const v = prompt('New semester tag:');
+                    handleCreate(v, setSem, semOpts, setSemOpts);
+                  })()
                   : setSem(e.target.value)
               }
               className="w-full px-4 py-2 rounded bg-gray-900 border border-gray-700 focus:outline-none focus:border-white"
@@ -169,9 +192,9 @@ export default function Upload() {
               onChange={(e) =>
                 e.target.value === '__create'
                   ? (() => {
-                      const v = prompt('New year tag:');
-                      handleCreate(v, setYear, yearOpts, setYearOpts);
-                    })()
+                    const v = prompt('New year tag:');
+                    handleCreate(v, setYear, yearOpts, setYearOpts);
+                  })()
                   : setYear(e.target.value)
               }
               className="w-full px-4 py-2 rounded bg-gray-900 border border-gray-700 focus:outline-none focus:border-white"
