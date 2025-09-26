@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createWorker } from 'tesseract.js';
+//import { createWorker } from 'tesseract.js';
 
 export default function SummarizeButton({ fileURL }) {
     const [showModal, setShowModal] = useState(false);
@@ -15,64 +15,64 @@ export default function SummarizeButton({ fileURL }) {
         setSummary('');
         setProgress('Initializing OCR...');
 
-        try {
-            // 1. Initialize Tesseract Worker
-            const worker = await createWorker('eng', 1, {
-                logger: m => {
-                    if (m.status === 'recognizing text') {
-                        setProgress(`Recognizing Text: ${Math.round(m.progress * 100)}%`);
-                    }
-                },
-            });
+        // try {
+        //     // 1. Initialize Tesseract Worker
+        //     const worker = await createWorker('eng', 1, {
+        //         logger: m => {
+        //             if (m.status === 'recognizing text') {
+        //                 setProgress(`Recognizing Text: ${Math.round(m.progress * 100)}%`);
+        //             }
+        //         },
+        //     });
 
-            // 2. Perform OCR on the PDF file URL
-            // NOTE: This can be slow for large, multi-page PDFs.
-            // Tesseract.js needs to fetch the file, which can cause CORS issues if not configured correctly in Firebase Storage.
-            const { data: { text } } = await worker.recognize(fileURL);
-            await worker.terminate();
+        //     // 2. Perform OCR on the PDF file URL
+        //     // NOTE: This can be slow for large, multi-page PDFs.
+        //     // Tesseract.js needs to fetch the file, which can cause CORS issues if not configured correctly in Firebase Storage.
+        //     const { data: { text } } = await worker.recognize(fileURL);
+        //     await worker.terminate();
 
-            if (!text) {
-                throw new Error("Could not extract any text from the document.");
-            }
+        //     if (!text) {
+        //         throw new Error("Could not extract any text from the document.");
+        //     }
 
-            setProgress('Text extracted. Summarizing...');
+        //     setProgress('Text extracted. Summarizing...');
 
-            // 3. Call Gemini API for Summarization
-            const apiKey = ""; // Leave blank
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        //     // 3. Call Gemini API for Summarization
+        //     const apiKey = ""; // Leave blank
+        //     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
-            const payload = {
-                contents: [{
-                    parts: [{ text: `Summarize the following text in a few concise bullet points:\n\n${text}` }]
-                }],
-            };
+        //     const payload = {
+        //         contents: [{
+        //             parts: [{ text: `Summarize the following text in a few concise bullet points:\n\n${text}` }]
+        //         }],
+        //     };
 
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+        //     const response = await fetch(apiUrl, {
+        //         method: 'POST',
+        //         headers: { 'Content-Type': 'application/json' },
+        //         body: JSON.stringify(payload)
+        //     });
 
-            if (!response.ok) {
-                throw new Error(`API call failed with status: ${response.status}`);
-            }
+        //     if (!response.ok) {
+        //         throw new Error(`API call failed with status: ${response.status}`);
+        //     }
 
-            const result = await response.json();
-            const summaryText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+        //     const result = await response.json();
+        //     const summaryText = result.candidates?.[0]?.content?.parts?.[0]?.text;
 
-            if (!summaryText) {
-                throw new Error("Failed to generate a summary from the API response.");
-            }
+        //     if (!summaryText) {
+        //         throw new Error("Failed to generate a summary from the API response.");
+        //     }
 
-            setSummary(summaryText);
+        //     setSummary(summaryText);
 
-        } catch (err) {
-            console.error("Summarization error:", err);
-            setError(err.message);
-        } finally {
-            setIsLoading(false);
-            setProgress('');
-        }
+        // } catch (err) {
+        //     console.error("Summarization error:", err);
+        //     setError(err.message);
+        // } finally {
+        //     setIsLoading(false);
+        //     setProgress('');
+        // }
     };
 
     return (
