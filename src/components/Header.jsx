@@ -1,7 +1,12 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase';
 import 'boxicons/css/boxicons.min.css';
 
 const Header = () => {
+    const { currentUser } = useAuth();
+
     const toggleMobileMenu = () => {
         const mobileMenu = document.getElementById('mobileMenu');
 
@@ -12,11 +17,17 @@ const Header = () => {
         }
     }
 
+    const handleLogout = async () => {
+        await signOut(auth);
+    }
+
+
     return (
         <header className="flex justify-between items-center py-4 px-4 lg:px-20">
             <h1 data-aos="fade-down"
                 data-aos-easing="linear"
-                data-aos-duration="1000" className="text-3xl md:text-4xl lg:text-5xl font-light m-0"><Link to={"/"}>
+                data-aos-duration="1000" className="text-3xl md:text-4xl lg:text-5xl font-light m-0">
+                <Link to={"/"}>
                     INKDEX
                 </Link>
             </h1>
@@ -40,11 +51,29 @@ const Header = () => {
                 </Link>
             </nav>
 
-            <button className="hidden md:block bg-[#a7a7a7] text-black py-3 px-8 rounded-full border-none font-medium transition-all duration-500 hover:bg-white cursor-pointer z-50">
-                <Link to="/auth">
-                    LOGIN   |   REGISTER
-                </Link>
-            </button>
+            {currentUser ? (
+                <div className="flex items-center gap-3 z-50">
+                    <Link
+                        to="/profile"
+                        className="bg-white text-black px-4 py-2 rounded-full font-medium hover:bg-gray-200 transition"
+                    >
+                        {currentUser.displayName || currentUser.email}
+                    </Link>
+                    <button
+                        onClick={handleLogout}
+                        className="text-gray-400 hover:text-white transition"
+                        title="Logout"
+                    >
+                        <i className="bx bx-log-out-circle text-xl" />
+                    </button>
+                </div>
+            ) : (
+                <button className="hidden md:block bg-[#a7a7a7] text-black py-3 px-8 rounded-full border-none font-medium transition-all duration-500 hover:bg-white cursor-pointer z-50">
+                    <Link to="/auth">
+                        LOGIN   |   REGISTER
+                    </Link>
+                </button>
+            )}
 
             {/* Mobile Menu Button - Visible only on Mobile */}
             <button onClick={toggleMobileMenu} className='md:hidden text-3xl p-2 z-50'>
