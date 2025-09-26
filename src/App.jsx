@@ -4,6 +4,7 @@ import Explore  from './pages/Explore';
 import Upload from './pages/Upload';
 import Auth from './pages/Auth';
 import Notes from './pages/Notes';
+import Profile from './pages/Profile';
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/upload" element={<Upload />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/notes" element={<Notes />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );
