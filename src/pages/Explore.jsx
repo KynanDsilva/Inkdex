@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import NoteCard from '../components/NoteCard';
+
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -10,6 +11,11 @@ export default function Explore() {
   /* ---------- original data ---------- */
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  /* ---------- summary-panel state ---------- */
+  const [summaryURL, setSummaryURL] = useState(null); // PDF url to summarise
+  const [summaryText, setSummaryText] = useState('');   // bullet text
+  const [loadingSum, setLoadingSum] = useState(false);
 
   /* ---------- filter states ---------- */
   const [search, setSearch] = useState('');
@@ -194,6 +200,36 @@ export default function Explore() {
           </div>
         )}
 
+        {summaryURL && (
+          <>
+            {/* backdrop – click to close */}
+            <div
+              className="panel-backdrop fixed inset-0 bg-black/50 z-30"
+              onClick={() => setSummaryURL(null)}
+            />
+            {/* side panel */}
+            <aside className="side-panel open fixed top-0 right-0 h-full w-1/3 min-w-[380px] max-w-[480px]
+                      bg-gray-900 border-l border-gray-700 p-6 text-white overflow-y-auto z-40">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold">Note Summary</h3>
+                <button
+                  onClick={() => setSummaryURL(null)}
+                  className="text-gray-400 hover:text-white text-2xl"
+                >
+                  &times;
+                </button>
+              </div>
+
+              {loadingSum && <p className="animate-pulse">Creating summary…</p>}
+              {summaryText && !loadingSum && (
+                <div className="prose prose-invert prose-sm text-gray-300 whitespace-pre-wrap">
+                  {summaryText}
+                </div>
+              )}
+            </aside>
+          </>
+        )}
+
         <div className="mt-10" data-aos="fade-up" data-aos-delay="600">
           <Link
             to="/upload"
@@ -202,6 +238,7 @@ export default function Explore() {
             Upload your own →
           </Link>
         </div>
+
       </main>
       <Footer />
     </>
