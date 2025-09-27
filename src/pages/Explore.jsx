@@ -22,8 +22,14 @@ export default function Explore() {
   useEffect(() => {
     const q = query(collection(db, 'notes'), orderBy('createdAt', 'desc'));
     const unsub = onSnapshot(q, (snap) => {
-      setFiles(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      const raw = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setFiles(raw);
       setLoading(false);
+
+      // ------ DEBUG: log every college value ------
+      const collegesInDb = [...new Set(raw.map(f => f.college))].sort();
+      console.log('Colleges in DB →', collegesInDb);
+      console.log('Raw notes →', raw);
     });
     return unsub;
   }, []);
@@ -35,7 +41,7 @@ export default function Explore() {
       (subjectF ? f.subject === subjectF : true) &&
       (semF ? f.semester === semF : true) &&
       (yearF ? f.year === yearF : true) &&
-      (collegeF ? f.college === collegeF : true)
+      (collegeF ? f.college?.trim().toLowerCase() === collegeF.trim().toLowerCase() : true)
     );
   }, [files, search, subjectF, semF, yearF, collegeF]);
 
