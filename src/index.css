@@ -7,3 +7,41 @@
     @apply bg-black text-white relative font-sans h-screen overflow-x-hidden;
   }
 }
+
+/* ===== Side-panel drawer ===== */
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 33vw;
+  /* ⅓ of viewport */
+  min-width: 380px;
+  max-width: 480px;
+  background-color: #111827;
+  /* gray-900 */
+  border-left: 1px solid #374151;
+  /* gray-700 */
+  transform: translateX(100%);
+  transition: transform 0.35s ease;
+  z-index: 40;
+  overflow-y: auto;
+}
+
+.side-panel.open {
+  transform: translateX(0);
+}
+
+/* Backdrop (click to close) */
+.panel-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 30;
+}
+
+/* Push main content left while panel is open */
+.with-panel {
+  margin-right: 33vw;
+  transition: margin-right 0.35s ease;
+}
