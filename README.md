@@ -46,8 +46,8 @@ Live Demo: [inkdex-studio.vercel.app](https://inkdex-studio.vercel.app)
 ## Getting Started
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/inkdex-studio.git
-cd inkdex-studio
+git clone https://github.com/KynanDsilva/Inkdex/tree/main
+cd Inkdex
 
 # 2. Install dependencies
 npm install
