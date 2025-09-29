@@ -55,6 +55,10 @@ npm install
 # 3. Configure Firebase
 # Add your Firebase project credentials in src/firebase.js
 
-# 4. Start the development server
+#4. Manually install remaining dependencies
+npm install @google/generative-ai
+npm install pdfjs-dist
+
+# 5. Start the development server
 npm run dev
 ```
