@@ -1,4 +1,4 @@
-# InkDex Studio  
+# InkDex
 
 [![Vercel Deploy](https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel)](https://inkdex-studio.vercel.app)  
 ![React](https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=white)  
